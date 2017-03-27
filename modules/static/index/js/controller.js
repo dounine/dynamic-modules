@@ -1,8 +1,6 @@
 var app = angular.module('indexModule', [
-    {
-        files: ['/index/js/service.js']
-    }
+    'indexSerModule'
 ]);
 app.controller('indexCtrl', ['indexSer', function (indexSer) {
-    console.info('indexCtrl')
+    console.info('indexCtrl');
 }]);

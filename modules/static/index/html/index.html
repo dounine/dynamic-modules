@@ -1,68 +1,52 @@
 <!DOCTYPE HTML>
 <HTML xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>feedback user</title>
+    <title>dynamic-modules</title>
     <script src="/common/jquery/dist/jquery.min.js"></script>
     <script src="/common/angular/angular.min.js"></script>
     <script src="/common/angular-ui-router/release/angular-ui-router.js"></script>
     <script src="/common/oclazyload/dist/ocLazyLoad.js"></script>
 </head>
 <body>
-<div ng-app="myApp" ng-controller="TestController">
+<div ng-app="myApp" ng-controller="indexCtrl">
     <div ui-view></div>
     <input ng-model="username"/>
     你的名字{{username}}
 </div>
 <script>
     var app = angular.module('myApp', ['ui.router', 'oc.lazyLoad']);
-    app.controller('TestController', function ($scope, $rootScope, $urlRouter, $ocLazyLoad, $location, $compile) {
-//        console.info('controller');
+    app.controller('indexCtrl', function ($scope, $rootScope, $urlRouter, $ocLazyLoad, $location) {
         $scope.username = "hello"
 
         $rootScope.$on('$locationChangeSuccess', function () {
             if (!$location.path()) {
                 $location.path('/index');
             }
-
-//            if ($location.path()=='/index') {
-//                $ocLazyLoad.load("/index/js/controller.js").then(function () {
-//                    $urlRouter.sync();
-//                });
-//            } else {
-                console.info('ChangeSuccess');
-                $ocLazyLoad.load($location.path()+"/js/router.js").then(function () {
+            $ocLazyLoad.load($location.path() + "/js/config.js").then(function () {
+                $ocLazyLoad.load($location.path() + "/js/router.js").then(function () {
                     $urlRouter.sync();
                 });
-//            }
-
+            });
+//            $ocLazyLoad.load($location.path() + "/js/router.js").then(function () {
+//                $urlRouter.sync();
+//            });
         });
-//        $urlRouter.listen();
-    });
+    })
+    ;
     app.run(['$rootScope', function ($rootScope) {
 //        console.info('run')
     }]);
-    app.config(['$provide', '$urlRouterProvider','$ocLazyLoadProvider', function ($provide, $urlRouterProvider,$ocLazyLoadProvider) {
-//        console.info('config');
+    app.config(['$provide', '$urlRouterProvider', function ($provide, $urlRouterProvider) {
+        $urlRouterProvider.deferIntercept();
         $provide.decorator('$state', function ($delegate, $ocLazyLoad) {
             var state = {};
-            // // angular对象还是有些实用的方法的，深拷贝对象算是一个
-            // // 这里做深拷贝不做浅拷贝是避免循环嵌套调用内存溢出
             angular.copy($delegate, state);
-            $delegate.transitionTo = function (to) {
-                // 跳转的时候有两种情况，一种是传入self对象，另一种是直接把state的id传进来
-                if (to.self) {
-                    // 当to为对象时，读取self.url属性获取路径，因为路径命名遵循"模块/页面"的方式，所以可以轻松判读取模块名
-//                    if (to.self.url == '/index') {
-//                        state.transitionTo.apply(null, arguments);
-//                    } else {
-//                        var mod = to.self.url.replace('main.', '').replace(/\/(.*)\/.*/, '$1');
-                        //模块加载完成后再调用默认的路由跳转函数
-                        console.info(to.self.url)
-                        $ocLazyLoad.load([to.self.url+'/js/controller.js']).then(function () {
-                            state.transitionTo.apply(null, [to.self.url.substring(1)]);
-                        });
-//                    }
-
+            $delegate.transitionTo = function (uiRouter) {
+                if (uiRouter.self) {
+                    console.info(uiRouter.self.url)
+                    $ocLazyLoad.load([uiRouter.self.url + '/js/controller.js']).then(function () {
+                        state.transitionTo.apply(null, [uiRouter.self.url.substring(1)]);
+                    });
                 } else {
                     $ocLazyLoad.load('/user/app/js/rev/controller.js').then(function () {
                         state.transitionTo.apply(null, arguments);
@@ -71,7 +55,7 @@
             }
             return $delegate;
         });
-        $urlRouterProvider.deferIntercept();
+
     }]);
 </script>
 </body>
