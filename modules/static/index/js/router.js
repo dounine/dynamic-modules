@@ -1,6 +1,6 @@
-var app = angular.module('indexModule',[]);
+var app = angular.module('indexModule');
 app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
-    console.info('router')
+    console.info('indexRouter')
     $stateProvider.state("index", {
         url: "/index",
         views: {

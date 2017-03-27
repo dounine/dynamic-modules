@@ -1,5 +1,5 @@
 var app = angular.module('indexModule',[]);
-app.config(['$provide','$ocLazyLoadProvider', function ($provide,$ocLazyLoadProvider) {
+app.config(['$ocLazyLoadProvider', function ($ocLazyLoadProvider) {
     $ocLazyLoadProvider.config({
         modules: [
             {

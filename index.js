@@ -1,12 +1,23 @@
 const app = require('koa')();//koa web应用
 const path = require('path');//路径
+const fs = require('fs');
 const router = require("koa-router")();//路由中间件
 const session = require('koa-session');//cookie
 const koaBody = require('koa-body');
 const staticCache = require('koa-static-cache');
 const routersPath = '/modules/node/';
 const sendfile = require('koa-sendfile');
+var configsCache = {};
 const port = 8888;
+
+function fileExists(path) {
+    try {
+        fs.accessSync(path, fs.F_OK);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
 
 app.keys = ['issp-node'];//session加密值
 app.use(session(app));//使用cookie
@@ -15,6 +26,33 @@ router.get('/', function *(next) {//根路由
     var status = yield (sendfile(this, path.resolve('modules/static/index/html/index.html')));
     if (!status) {
         this.throw(404);
+    }
+});
+router.get(/^\/module\/_config(?:\/.|$)/, function *(next) {
+    var moduleName = this.url.substring(16).replace('.js','');
+    var modules = moduleName.split('/');// 以'/'为分隔,第一个是模块名称,往后的为子模块
+    if (moduleName == '') {
+        this.throw(404);
+    }
+    var filePath = path.resolve('modules/static/' + modules[0] + '/js/' + (modules.shift(1) && modules.length > 0 ? modules.join('/') : '') + '/config.js');
+    if(Object.getOwnPropertyNames(configsCache).length==1000){
+        this.body = 'configsCache 对象缓存过大,请检查.';
+        return
+    }
+    if (configsCache[moduleName] == undefined) {//缓存,下次不再判断文件是否存在
+        if (fileExists(filePath)) {
+            configsCache[moduleName] = true;
+        } else {
+            configsCache[moduleName] = false;
+        }
+    }
+    if (configsCache[moduleName]) {
+        var status = yield (sendfile(this, filePath));
+        if (!status) {
+            this.throw(404);
+        }
+    } else {
+        this.body = '';
     }
 });
 
@@ -28,7 +66,7 @@ app.use(staticCache(path.join(__dirname, 'modules/static'), {
     maxAge: 365 * 24 * 60 * 60
 }))
 
-app.use(function *(next){
+app.use(function *(next) {
     var start = new Date;
     yield next;
     var ms = new Date - start;
