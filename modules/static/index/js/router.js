@@ -1,12 +1,15 @@
 var app = angular.module('app');
 app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
-    console.info('indexRouter')
     $stateProvider.state("index", {
         url: "/index",
         views: {
             "": {
-                templateUrl: "index/html/test.html",
+                templateUrl: "index/html/content.html",
                 controller: "indexCtrl"
+            },"header@index": {
+                templateUrl: "index/html/header.html"
+            },"footer@index": {
+                templateUrl: "index/html/footer.html"
             }
         }
     })

@@ -1,6 +1,5 @@
 var app = angular.module('userModule',[]);
 app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
-    console.info('userRouter')
     $stateProvider.state("index.user", {
         url: "/user",
         views: {
