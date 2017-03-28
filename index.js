@@ -23,7 +23,7 @@ app.keys = ['issp-node'];//session加密值
 app.use(session(app));//使用cookie
 app.use(koaBody());//必需要路由用之前使用,不然获取不到表单
 router.get('/', function *(next) {//根路由
-    var status = yield (sendfile(this, path.resolve('modules/static/index/html/index.html')));
+    var status = yield (sendfile(this, path.resolve('modules/static/root/_res/html/index.html')));
     if (!status) {
         this.throw(404);
     }
@@ -34,7 +34,7 @@ router.get(/^\/module\/_config(?:\/.|$)/, function *(next) {
     if (moduleName == '') {
         this.throw(404);
     }
-    var filePath = path.resolve('modules/static/' + modules[0] + '/js/' + (modules.shift(1) && modules.length > 0 ? modules.join('/') : '') + '/config.js');
+    var filePath = path.resolve('modules/static/' + modules[0] + '/_res/js/' + (modules.shift(1) && modules.length > 0 ? modules.join('/') : '') + '/config.js');
     if(Object.getOwnPropertyNames(configsCache).length==1000){
         this.body = 'configsCache 对象缓存过大,请检查.';
         return
