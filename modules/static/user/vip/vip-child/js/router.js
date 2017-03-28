@@ -12,7 +12,8 @@ app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
         url: "/list[12]",
         views: {
             "content@index.user.vip[1].vip-child": {
-                templateUrl: "user/vip/vip-child/list/html/div.html"
+                templateUrl: "user/vip/vip-child/list/html/div.html",
+                controller: "userVipVipChildListCtrl"
             }
         }
     }).state("index.user.vip[1].vip-child.add[12]", {
