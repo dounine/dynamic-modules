@@ -1,5 +1,5 @@
 var app = angular.module('app');
-app.config(['$ocLazyLoadProvider', function ($ocLazyLoadProvider) {
+app.config(function ($ocLazyLoadProvider) {
     $ocLazyLoadProvider.config({
         modules: [
             {
@@ -8,4 +8,4 @@ app.config(['$ocLazyLoadProvider', function ($ocLazyLoadProvider) {
             }
         ]
     });
-}]);
+});

@@ -3,8 +3,15 @@ var app = angular.module('userVipVipChildModule', [
         files: ['/user/vip/vip-child/js/service.js']
     }
 ]);
-app.controller('userVipVipChildCtrl', ['$scope','userVipVipChildSer', function ($scope,userVipVipChildSer) {
-    $scope.moduleName = '这是VIP子级页面';
-}]).controller('userVipVipChildListCtrl', ['$scope', function ($scope) {
+app.controller('userVipVipChildCtrl', function ($scope, userVipVipChildSer) {
+    'ngInject';
+    var vm = $scope;
+    vm.moduleName = '这是VIP子级页面';
+
+}).controller('userVipVipChildListCtrl', function ($scope) {
+    var vm = $scope;
+    vm.list = function () {
+        alert();
+    }
     console.info('list1');
-}]);
+});

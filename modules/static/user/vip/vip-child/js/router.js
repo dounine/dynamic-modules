@@ -1,5 +1,5 @@
-var app = angular.module('userVipVipChildModule',[]);
-app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
+var app = angular.module('userVipVipChildModule', []);
+app.config(function ($provide, $stateProvider) {
     $stateProvider.state("index.user.vip[1].vip-child", {
         url: "/vip-child",
         views: {
@@ -31,4 +31,4 @@ app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
             }
         }
     });
-}]);
+});

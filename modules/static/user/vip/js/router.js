@@ -1,5 +1,5 @@
 var app = angular.module('userVipModule',[]);
-app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
+app.config(function ($provide, $stateProvider) {
     $stateProvider.state("index.user.vip[1]", {
         url: "/vip[1]",
         views: {
@@ -8,5 +8,5 @@ app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
                 controller: "userVipCtrl"
             }
         }
-    })
-}]);
+    });
+});

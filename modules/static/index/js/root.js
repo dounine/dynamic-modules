@@ -89,7 +89,7 @@ function loadModule($ocLazyLoad, $urlRouter, moduleName, filter, fun) {
 }
 
 
-app.config(['$provide', '$urlRouterProvider', function ($provide, $urlRouterProvider) {
+app.config(function ($provide, $urlRouterProvider) {
     $urlRouterProvider.deferIntercept();
     $provide.decorator('$state', function ($delegate, $ocLazyLoad, $urlRouter) {//ui-router 渲染
         var state = {};
@@ -147,4 +147,4 @@ app.config(['$provide', '$urlRouterProvider', function ($provide, $urlRouterProv
         return $delegate;
     });
 
-}]);
+});

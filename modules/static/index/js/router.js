@@ -1,5 +1,5 @@
 var app = angular.module('app');
-app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
+app.config(function ($provide, $stateProvider) {
     $stateProvider.state("index", {
         url: "/index",
         views: {
@@ -13,4 +13,4 @@ app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
             }
         }
     })
-}]);
+});
