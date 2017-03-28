@@ -8,11 +8,25 @@ app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
                 controller: "userVipVipChildCtrl"
             }
         }
-    }).state("index.user.vip[1].vip-child.div[12]", {
-        url: "/div[12]",
+    }).state("index.user.vip[1].vip-child.list[12]", {
+        url: "/list[12]",
         views: {
             "content@index.user.vip[1].vip-child": {
-                templateUrl: "user/vip/vip-child/html/div.html"
+                templateUrl: "user/vip/vip-child/list/html/div.html"
+            }
+        }
+    }).state("index.user.vip[1].vip-child.add[12]", {
+        url: "/add[12]",
+        views: {
+            "content@index.user.vip[1].vip-child": {
+                templateUrl: "user/vip/vip-child/add/html/div.html"
+            }
+        }
+    }).state("index.user.vip[1].vip-child.del[12]", {
+        url: "/del[12]",
+        views: {
+            "content@index.user.vip[1].vip-child": {
+                templateUrl: "user/vip/vip-child/del/html/div.html"
             }
         }
     });
