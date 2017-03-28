@@ -12,20 +12,72 @@ app.controller('root', function ($rootScope, $urlRouter, $ocLazyLoad, $location)
         var modules = moduleName.substring(1).split('/');
         var prefixModules = [];
         modules.forEach(function (module) {
-            prefixModules.push(module);
-            loadModule($ocLazyLoad, $urlRouter, prefixModules.join('/'));//加载模块
-            if (module == 'index') {
+            var _module = module;
+            var filter = _module.match(/\[\d+\]/g);
+            if (filter) {
+                _module = module.replace(/\[\d+\]/g, '');
+            }
+            prefixModules.push(_module);
+
+            loadModule($ocLazyLoad, $urlRouter, prefixModules.join('/'), filter);//加载模块
+            if (_module == 'index') {
                 prefixModules.shift(1);//去掉入口模块拼接
             }
         });
     });
 });
 
-function loadModule($ocLazyLoad, $urlRouter, moduleName, fun) {
+function loadModule($ocLazyLoad, $urlRouter, moduleName, filter, fun) {
     moduleName = moduleName[0] != '/' ? ('/' + moduleName) : moduleName
-    $ocLazyLoad.load('/module/_config' + moduleName + '.js').then(function () {
-        $ocLazyLoad.load(moduleName + "/js/router.js").then(function () {
-            $ocLazyLoad.load(moduleName + '/js/controller.js').then(function () {
+    var loadFiles = ['/module/_config' + moduleName + '.js', moduleName + '/js/router.js', moduleName + '/js/controller.js'];
+    if (filter) {
+        var filterStr = filter.pop();
+        if (filterStr == '[123]') {
+            return;
+        }
+
+        if (filterStr.match('1')) {//不加载config.js配置文件
+            loadFiles.shift(0);
+            if (filterStr.match('2')) {//不加载router.js路由文件
+                loadFiles.shift(0);
+                $ocLazyLoad.load(loadFiles[0]).then(function () {
+                    $urlRouter.sync();
+                    if (fun) {
+                        fun();
+                    }
+                });
+            } else {
+                $ocLazyLoad.load(loadFiles[0]).then(function () {
+                    loadFiles.shift(0);
+                    $ocLazyLoad.load(loadFiles[0]).then(function () {
+                        $urlRouter.sync();
+                        if (fun) {
+                            fun();
+                        }
+                    });
+                });
+            }
+            return;
+        } else if (filterStr.match('2')) {//不加载controller.js控制器文件
+            loadFiles.splice(1, 1);
+            $ocLazyLoad.load(loadFiles[0]).then(function () {
+                loadFiles.shift(0);
+                $ocLazyLoad.load(loadFiles[0]).then(function () {
+                    $urlRouter.sync();
+                    if (fun) {
+                        fun();
+                    }
+                });
+            });
+            return;
+        }
+    }
+
+    $ocLazyLoad.load(loadFiles[0]).then(function () {
+        loadFiles.shift(0);
+        $ocLazyLoad.load(loadFiles[0]).then(function () {
+            loadFiles.shift(0);
+            $ocLazyLoad.load(loadFiles[0]).then(function () {
                 $urlRouter.sync();
                 if (fun) {
                     fun();
@@ -33,6 +85,7 @@ function loadModule($ocLazyLoad, $urlRouter, moduleName, fun) {
             });
         });
     });
+
 }
 
 
@@ -50,9 +103,23 @@ app.config(['$provide', '$urlRouterProvider', function ($provide, $urlRouterProv
                     name = name.replace('index.', '');
                     name = '/' + name.split('.').join('/');
                 }
-                $ocLazyLoad.load([name + '/js/controller.js']).then(function () {
-                    state.transitionTo.apply(null, args);
-                });
+
+                var filter = name.match(/\[\d+\]/g);
+                if (filter) {
+                    name = name.replace(/\[\d+\]/g, '');
+                }
+
+                if (filter) {
+                    if (!filter.pop().match('3')) {
+                        $ocLazyLoad.load([name + '/js/controller.js']).then(function () {
+                            state.transitionTo.apply(null, args);
+                        });
+                    }
+                } else {
+                    $ocLazyLoad.load([name + '/js/controller.js']).then(function () {
+                        state.transitionTo.apply(null, args);
+                    });
+                }
             } else {// ui-sref 点击进来
                 if (uiRouter[0] == '.') {//判断是否有相对路径 .user
                     var sname = args[2].relative.self.name;
@@ -66,7 +133,13 @@ app.config(['$provide', '$urlRouterProvider', function ($provide, $urlRouterProv
                     }
                 }
                 var path = (uiRouter.indexOf('index.') == 0) ? uiRouter.replace('index.', '') : uiRouter;
-                loadModule($ocLazyLoad, $urlRouter, path.split('.').join('/'), function () {
+
+                var filter = path.match(/\[\d+\]/g);
+                if (filter) {
+                    path = path.replace(/\[\d+\]/g, '');
+                }
+
+                loadModule($ocLazyLoad, $urlRouter, path.split('.').join('/'), filter, function () {
                     state.transitionTo.apply(null, args);
                 });
             }

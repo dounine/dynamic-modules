@@ -1,7 +1,7 @@
 var app = angular.module('userVipModule',[]);
 app.config(['$provide', '$stateProvider', function ($provide, $stateProvider) {
-    $stateProvider.state("index.user.vip", {
-        url: "/vip",
+    $stateProvider.state("index.user.vip[1]", {
+        url: "/vip[1]",
         views: {
             "content@index.user": {
                 templateUrl: "user/vip/html/index.html",
