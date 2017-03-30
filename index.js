@@ -8,7 +8,7 @@ const staticCache = require('koa-static-cache');
 const routersPath = '/modules/node/';
 const sendfile = require('koa-sendfile');
 var configsCache = {};
-const port = 8888;
+const port = 8088;
 
 function fileExists(path) {
     try {

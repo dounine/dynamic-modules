@@ -1,6 +1,7 @@
 var app = angular.module('app', ['ui.router', 'oc.lazyLoad']);
 app.controller('root', function ($rootScope, $urlRouter, $ocLazyLoad, $location) {
     $rootScope.$on('$locationChangeSuccess', function () {//url地扯改变或者刷新
+        console.info('refresh');
         if (!$location.path()) {
             $location.path('/root');
         } else {
@@ -21,6 +22,7 @@ app.controller('root', function ($rootScope, $urlRouter, $ocLazyLoad, $location)
             loadModule($ocLazyLoad, $urlRouter, prefixModules.join('/'), filter);//加载模块
         });
     });
+    $urlRouter.listen();
 });
 
 function loadModule($ocLazyLoad, $urlRouter, moduleName, filter, fun) {
@@ -80,7 +82,6 @@ function loadModule($ocLazyLoad, $urlRouter, moduleName, filter, fun) {
             });
         });
     });
-
 }
 
 
@@ -102,7 +103,6 @@ app.config(function ($provide, $urlRouterProvider) {
                 if (filter) {
                     name = name.replace(/\[\d+\]/g, '');
                 }
-
                 if (filter) {
                     if (!filter.pop().match('3')) {
                         $ocLazyLoad.load([name + '/_res/js/controller.js']).then(function () {
@@ -126,17 +126,39 @@ app.config(function ($provide, $urlRouterProvider) {
                         var len = sname.indexOf(uiRouter) != -1 ? sname.indexOf(uiRouter) : sname.length;
                         uiRouter = sname.substring(0, len) + uiRouter;
                     }
-
                 }
                 var path = uiRouter;
-                var filter = path.match(/\[\d+\]/g);
-                if (filter) {
-                    path = path.replace(/\[\d+\]/g, '');
+                if (path[0] != '_') {
+                    var filter = path.match(/\[\d+\]/g);
+                    if (filter) {
+                        path = path.replace(/\[\d+\]/g, '');
+                    }
+                    loadModule($ocLazyLoad, $urlRouter, path.split('.').join('/'), filter, function () {
+                        state.transitionTo.apply(null, args);
+                    });
+                } else {
+                    var modules = path.substring(1).split('.');
+                    var prefixModules = [];
+                    modules.forEach(function (module, i) {
+                        var _module = module;
+                        var filter = _module.match(/\[\d+\]/g);
+                        if (filter) {
+                            _module = module.replace(/\[\d+\]/g, '');
+                        }
+                        prefixModules.push(_module);
+                        if (args[0][0] == '_') {
+                            args[0] = args[0].substring(1);
+                        }
+                        loadModule($ocLazyLoad, $urlRouter, prefixModules.join('/'), filter, function () {
+                            try {
+                                state.transitionTo.apply(null, args);
+                            } catch (e) {
+                            }
+                        });//加载模块
+                    });
                 }
 
-                loadModule($ocLazyLoad, $urlRouter, path.split('.').join('/'), filter, function () {
-                    state.transitionTo.apply(null, args);
-                });
+
             }
         }
         return $delegate;
